@@ -1,37 +1,30 @@
-克隆自 https://github.com/derekgr/hivething
-更改了TCLIService, 在inf/目录下，并修改了相应的调用。支持Hive2.0+版本
-## usage
+    克隆自 https://github.com/derekgr/hivething
+    更改了TCLIService, 在inf/目录下，并修改了相应的调用。支持Hive2.0+版本
+## Usage
 	import (
-	 	hivething "github.com/dazheng/gohive"
+		"fmt"
+	
+		"github.com/dazheng/gohive"
 	)
 	
-	func ListTablesAsync() []string {
-	  db, err := hivething.Connect("127.0.0.1:10000", hivething.DefaultOptions)
-	  if err != nil {
-	    // handle
-	  }
-	  defer db.Close()
+	func main() {
 	
-	  results, err := db.Query("SHOW TABLES")
-	  if err != nil {
-	      // handle
-	  }
+		conn, err := gohive.Connect("127.0.0.1:10000", gohive.DefaultOptions)
+		if err != nil {
+			fmt.Printf("Connect error %v", err)
+		}
 	
-	  status, err := results.Wait()
-	  if err != nil {
-	      // handle
-	  }
+		rows, err := conn.Query("SHOW TABLES")
+		if err != nil {
+			fmt.Printf("Connection.Query error: %v", err)
+		}
 	
-	  if status.IsSuccess() {
-	      var tableName string
-	      for results.Next() {
-	          results.Scan(&tableName)
-	          append(tables, tableName)
-	      }
-	  }
-	  else {
-	      // handle status.Error
-	  }
+		status, err := rows.Wait()
+		if err != nil {
+			fmt.Printf("Connection.Wait error: %v", err)
+		}
 	
-	  return tables
+		if !status.IsSuccess() {
+			fmt.Printf("Unsuccessful query execution: %v", status)
+		}
 	}
