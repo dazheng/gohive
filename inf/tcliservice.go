@@ -156,16 +156,16 @@ func (p *TCLIServiceClient) recvOpenSession() (value *TOpenSessionResp, err erro
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error27 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error28 error
-		error28, err = error27.Read(iprot)
+		error30 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error31 error
+		error31, err = error30.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error28
+		err = error31
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -233,16 +233,16 @@ func (p *TCLIServiceClient) recvCloseSession() (value *TCloseSessionResp, err er
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error29 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error30 error
-		error30, err = error29.Read(iprot)
+		error32 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error33 error
+		error33, err = error32.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error30
+		err = error33
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -310,16 +310,16 @@ func (p *TCLIServiceClient) recvGetInfo() (value *TGetInfoResp, err error) {
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error31 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error32 error
-		error32, err = error31.Read(iprot)
+		error34 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error35 error
+		error35, err = error34.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error32
+		err = error35
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -387,16 +387,16 @@ func (p *TCLIServiceClient) recvExecuteStatement() (value *TExecuteStatementResp
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error33 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error34 error
-		error34, err = error33.Read(iprot)
+		error36 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error37 error
+		error37, err = error36.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error34
+		err = error37
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -464,16 +464,16 @@ func (p *TCLIServiceClient) recvGetTypeInfo() (value *TGetTypeInfoResp, err erro
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error35 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error36 error
-		error36, err = error35.Read(iprot)
+		error38 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error39 error
+		error39, err = error38.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error36
+		err = error39
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -541,16 +541,16 @@ func (p *TCLIServiceClient) recvGetCatalogs() (value *TGetCatalogsResp, err erro
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error37 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error38 error
-		error38, err = error37.Read(iprot)
+		error40 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error41 error
+		error41, err = error40.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error38
+		err = error41
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -618,16 +618,16 @@ func (p *TCLIServiceClient) recvGetSchemas() (value *TGetSchemasResp, err error)
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error39 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error40 error
-		error40, err = error39.Read(iprot)
+		error42 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error43 error
+		error43, err = error42.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error40
+		err = error43
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -695,16 +695,16 @@ func (p *TCLIServiceClient) recvGetTables() (value *TGetTablesResp, err error) {
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error41 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error42 error
-		error42, err = error41.Read(iprot)
+		error44 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error45 error
+		error45, err = error44.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error42
+		err = error45
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -772,16 +772,16 @@ func (p *TCLIServiceClient) recvGetTableTypes() (value *TGetTableTypesResp, err 
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error43 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error44 error
-		error44, err = error43.Read(iprot)
+		error46 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error47 error
+		error47, err = error46.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error44
+		err = error47
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -849,16 +849,16 @@ func (p *TCLIServiceClient) recvGetColumns() (value *TGetColumnsResp, err error)
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error45 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error46 error
-		error46, err = error45.Read(iprot)
+		error48 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error49 error
+		error49, err = error48.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error46
+		err = error49
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -926,16 +926,16 @@ func (p *TCLIServiceClient) recvGetFunctions() (value *TGetFunctionsResp, err er
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error47 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error48 error
-		error48, err = error47.Read(iprot)
+		error50 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error51 error
+		error51, err = error50.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error48
+		err = error51
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1003,16 +1003,16 @@ func (p *TCLIServiceClient) recvGetPrimaryKeys() (value *TGetPrimaryKeysResp, er
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error49 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error50 error
-		error50, err = error49.Read(iprot)
+		error52 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error53 error
+		error53, err = error52.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error50
+		err = error53
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1080,16 +1080,16 @@ func (p *TCLIServiceClient) recvGetCrossReference() (value *TGetCrossReferenceRe
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error51 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error52 error
-		error52, err = error51.Read(iprot)
+		error54 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error55 error
+		error55, err = error54.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error52
+		err = error55
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1157,16 +1157,16 @@ func (p *TCLIServiceClient) recvGetOperationStatus() (value *TGetOperationStatus
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error53 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error54 error
-		error54, err = error53.Read(iprot)
+		error56 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error57 error
+		error57, err = error56.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error54
+		err = error57
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1234,16 +1234,16 @@ func (p *TCLIServiceClient) recvCancelOperation() (value *TCancelOperationResp, 
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error55 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error56 error
-		error56, err = error55.Read(iprot)
+		error58 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error59 error
+		error59, err = error58.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error56
+		err = error59
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1311,16 +1311,16 @@ func (p *TCLIServiceClient) recvCloseOperation() (value *TCloseOperationResp, er
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error57 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error58 error
-		error58, err = error57.Read(iprot)
+		error60 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error61 error
+		error61, err = error60.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error58
+		err = error61
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1388,16 +1388,16 @@ func (p *TCLIServiceClient) recvGetResultSetMetadata() (value *TGetResultSetMeta
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error59 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error60 error
-		error60, err = error59.Read(iprot)
+		error62 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error63 error
+		error63, err = error62.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error60
+		err = error63
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1465,16 +1465,16 @@ func (p *TCLIServiceClient) recvFetchResults() (value *TFetchResultsResp, err er
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error61 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error62 error
-		error62, err = error61.Read(iprot)
+		error64 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error65 error
+		error65, err = error64.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error62
+		err = error65
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1542,16 +1542,16 @@ func (p *TCLIServiceClient) recvGetDelegationToken() (value *TGetDelegationToken
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error63 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error64 error
-		error64, err = error63.Read(iprot)
+		error66 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error67 error
+		error67, err = error66.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error64
+		err = error67
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1619,16 +1619,16 @@ func (p *TCLIServiceClient) recvCancelDelegationToken() (value *TCancelDelegatio
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error65 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error66 error
-		error66, err = error65.Read(iprot)
+		error68 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error69 error
+		error69, err = error68.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error66
+		err = error69
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1696,16 +1696,16 @@ func (p *TCLIServiceClient) recvRenewDelegationToken() (value *TRenewDelegationT
 		return
 	}
 	if mTypeId == thrift.EXCEPTION {
-		error67 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
-		var error68 error
-		error68, err = error67.Read(iprot)
+		error70 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error71 error
+		error71, err = error70.Read(iprot)
 		if err != nil {
 			return
 		}
 		if err = iprot.ReadMessageEnd(); err != nil {
 			return
 		}
-		err = error68
+		err = error71
 		return
 	}
 	if mTypeId != thrift.REPLY {
@@ -1743,29 +1743,29 @@ func (p *TCLIServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFuncti
 
 func NewTCLIServiceProcessor(handler TCLIService) *TCLIServiceProcessor {
 
-	self69 := &TCLIServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
-	self69.processorMap["OpenSession"] = &tCLIServiceProcessorOpenSession{handler: handler}
-	self69.processorMap["CloseSession"] = &tCLIServiceProcessorCloseSession{handler: handler}
-	self69.processorMap["GetInfo"] = &tCLIServiceProcessorGetInfo{handler: handler}
-	self69.processorMap["ExecuteStatement"] = &tCLIServiceProcessorExecuteStatement{handler: handler}
-	self69.processorMap["GetTypeInfo"] = &tCLIServiceProcessorGetTypeInfo{handler: handler}
-	self69.processorMap["GetCatalogs"] = &tCLIServiceProcessorGetCatalogs{handler: handler}
-	self69.processorMap["GetSchemas"] = &tCLIServiceProcessorGetSchemas{handler: handler}
-	self69.processorMap["GetTables"] = &tCLIServiceProcessorGetTables{handler: handler}
-	self69.processorMap["GetTableTypes"] = &tCLIServiceProcessorGetTableTypes{handler: handler}
-	self69.processorMap["GetColumns"] = &tCLIServiceProcessorGetColumns{handler: handler}
-	self69.processorMap["GetFunctions"] = &tCLIServiceProcessorGetFunctions{handler: handler}
-	self69.processorMap["GetPrimaryKeys"] = &tCLIServiceProcessorGetPrimaryKeys{handler: handler}
-	self69.processorMap["GetCrossReference"] = &tCLIServiceProcessorGetCrossReference{handler: handler}
-	self69.processorMap["GetOperationStatus"] = &tCLIServiceProcessorGetOperationStatus{handler: handler}
-	self69.processorMap["CancelOperation"] = &tCLIServiceProcessorCancelOperation{handler: handler}
-	self69.processorMap["CloseOperation"] = &tCLIServiceProcessorCloseOperation{handler: handler}
-	self69.processorMap["GetResultSetMetadata"] = &tCLIServiceProcessorGetResultSetMetadata{handler: handler}
-	self69.processorMap["FetchResults"] = &tCLIServiceProcessorFetchResults{handler: handler}
-	self69.processorMap["GetDelegationToken"] = &tCLIServiceProcessorGetDelegationToken{handler: handler}
-	self69.processorMap["CancelDelegationToken"] = &tCLIServiceProcessorCancelDelegationToken{handler: handler}
-	self69.processorMap["RenewDelegationToken"] = &tCLIServiceProcessorRenewDelegationToken{handler: handler}
-	return self69
+	self72 := &TCLIServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
+	self72.processorMap["OpenSession"] = &tCLIServiceProcessorOpenSession{handler: handler}
+	self72.processorMap["CloseSession"] = &tCLIServiceProcessorCloseSession{handler: handler}
+	self72.processorMap["GetInfo"] = &tCLIServiceProcessorGetInfo{handler: handler}
+	self72.processorMap["ExecuteStatement"] = &tCLIServiceProcessorExecuteStatement{handler: handler}
+	self72.processorMap["GetTypeInfo"] = &tCLIServiceProcessorGetTypeInfo{handler: handler}
+	self72.processorMap["GetCatalogs"] = &tCLIServiceProcessorGetCatalogs{handler: handler}
+	self72.processorMap["GetSchemas"] = &tCLIServiceProcessorGetSchemas{handler: handler}
+	self72.processorMap["GetTables"] = &tCLIServiceProcessorGetTables{handler: handler}
+	self72.processorMap["GetTableTypes"] = &tCLIServiceProcessorGetTableTypes{handler: handler}
+	self72.processorMap["GetColumns"] = &tCLIServiceProcessorGetColumns{handler: handler}
+	self72.processorMap["GetFunctions"] = &tCLIServiceProcessorGetFunctions{handler: handler}
+	self72.processorMap["GetPrimaryKeys"] = &tCLIServiceProcessorGetPrimaryKeys{handler: handler}
+	self72.processorMap["GetCrossReference"] = &tCLIServiceProcessorGetCrossReference{handler: handler}
+	self72.processorMap["GetOperationStatus"] = &tCLIServiceProcessorGetOperationStatus{handler: handler}
+	self72.processorMap["CancelOperation"] = &tCLIServiceProcessorCancelOperation{handler: handler}
+	self72.processorMap["CloseOperation"] = &tCLIServiceProcessorCloseOperation{handler: handler}
+	self72.processorMap["GetResultSetMetadata"] = &tCLIServiceProcessorGetResultSetMetadata{handler: handler}
+	self72.processorMap["FetchResults"] = &tCLIServiceProcessorFetchResults{handler: handler}
+	self72.processorMap["GetDelegationToken"] = &tCLIServiceProcessorGetDelegationToken{handler: handler}
+	self72.processorMap["CancelDelegationToken"] = &tCLIServiceProcessorCancelDelegationToken{handler: handler}
+	self72.processorMap["RenewDelegationToken"] = &tCLIServiceProcessorRenewDelegationToken{handler: handler}
+	return self72
 }
 
 func (p *TCLIServiceProcessor) Process(iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1778,12 +1778,12 @@ func (p *TCLIServiceProcessor) Process(iprot, oprot thrift.TProtocol) (success b
 	}
 	iprot.Skip(thrift.STRUCT)
 	iprot.ReadMessageEnd()
-	x70 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
+	x73 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
 	oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-	x70.Write(oprot)
+	x73.Write(oprot)
 	oprot.WriteMessageEnd()
 	oprot.Flush()
-	return false, x70
+	return false, x73
 
 }
 
@@ -2854,7 +2854,7 @@ func (p *TCLIServiceOpenSessionArgs) Read(iprot thrift.TProtocol) error {
 
 func (p *TCLIServiceOpenSessionArgs) readField1(iprot thrift.TProtocol) error {
 	p.Req = &TOpenSessionReq{
-		ClientProtocol: 8,
+		ClientProtocol: 9,
 	}
 	if err := p.Req.Read(iprot); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Req), err)
@@ -2955,7 +2955,7 @@ func (p *TCLIServiceOpenSessionResult) Read(iprot thrift.TProtocol) error {
 
 func (p *TCLIServiceOpenSessionResult) readField0(iprot thrift.TProtocol) error {
 	p.Success = &TOpenSessionResp{
-		ServerProtocolVersion: 8,
+		ServerProtocolVersion: 9,
 	}
 	if err := p.Success.Read(iprot); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)

@@ -7,23 +7,14 @@ import (
 )
 
 func main() {
-
 	conn, err := gohive.Connect("127.0.0.1:10000", gohive.DefaultOptions)
 	if err != nil {
-		fmt.Printf("Connect error %v", err)
+		fmt.Errorf("Connect error %v", err)
 	}
+	defer conn.Close()
 
-	rows, err := conn.Query("SHOW TABLES")
+	_, err = conn.Exec("create table if not exists t(c1 int)")
 	if err != nil {
-		fmt.Printf("Connection.Query error: %v", err)
-	}
-
-	status, err := rows.Wait()
-	if err != nil {
-		fmt.Printf("Connection.Wait error: %v", err)
-	}
-
-	if !status.IsSuccess() {
-		fmt.Printf("Unsuccessful query execution: %v", status)
+		fmt.Errorf("Connection.Exec error: %v", err)
 	}
 }

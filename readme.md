@@ -1,4 +1,5 @@
-    克隆自 https://github.com/derekgr/hivething
+## gohive
+	克隆自 https://github.com/derekgr/hivething
     更改了TCLIService, 在inf/目录下，并修改了相应的调用。支持Hive2.0+版本
 ## Usage
 	import (

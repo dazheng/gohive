@@ -6,21 +6,21 @@ import (
 	"log"
 	"time"
 
-	gohive "github.com/dazheng/gohive/inf"
+	inf "github.com/dazheng/gohive/inf"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
 type rowSet struct {
-	thrift    *gohive.TCLIServiceClient
-	operation *gohive.TOperationHandle
+	thrift    *inf.TCLIServiceClient
+	operation *inf.TOperationHandle
 	options   Options
 
-	columns    []*gohive.TColumnDesc
+	columns    []*inf.TColumnDesc
 	columnStrs []string
 
 	offset  int
-	rowSet  *gohive.TRowSet
+	rowSet  *inf.TRowSet
 	hasMore bool
 	ready   bool
 
@@ -43,12 +43,12 @@ type RowSet interface {
 // Represents job status, including success state and time the
 // status was updated.
 type Status struct {
-	state *gohive.TOperationState
+	state *inf.TOperationState
 	Error error
 	At    time.Time
 }
 
-func newRowSet(thrift *gohive.TCLIServiceClient, operation *gohive.TOperationHandle, options Options) RowSet {
+func newRowSet(thrift *inf.TCLIServiceClient, operation *inf.TOperationHandle, options Options) RowSet {
 	return &rowSet{thrift, operation, options, nil, nil, 0, nil, true, false, nil}
 }
 
@@ -65,7 +65,7 @@ func Reattach(conn *Connection, handle []byte) (RowSet, error) {
 
 // Issue a thrift call to check for the job's current status.
 func (r *rowSet) Poll() (*Status, error) {
-	req := gohive.NewTGetOperationStatusReq()
+	req := inf.NewTGetOperationStatusReq()
 	req.OperationHandle = r.operation
 
 	resp, err := r.thrift.GetOperationStatus(req)
@@ -96,7 +96,7 @@ func (r *rowSet) Wait() (*Status, error) {
 		if status.IsComplete() {
 			if status.IsSuccess() {
 				// Fetch operation metadata.
-				metadataReq := gohive.NewTGetResultSetMetadataReq()
+				metadataReq := inf.NewTGetResultSetMetadataReq()
 				metadataReq.OperationHandle = r.operation
 
 				metadataResp, err := r.thrift.GetResultSetMetadata(metadataReq)
@@ -149,9 +149,9 @@ func (r *rowSet) Next() bool {
 			return false
 		}
 
-		fetchReq := gohive.NewTFetchResultsReq()
+		fetchReq := inf.NewTFetchResultsReq()
 		fetchReq.OperationHandle = r.operation
-		fetchReq.Orientation = gohive.TFetchOrientation_FETCH_NEXT
+		fetchReq.Orientation = inf.TFetchOrientation_FETCH_NEXT
 		fetchReq.MaxRows = r.options.BatchSize
 
 		resp, err := r.thrift.FetchResults(fetchReq)
@@ -169,7 +169,7 @@ func (r *rowSet) Next() bool {
 		r.rowSet = resp.Results
 		r.hasMore = *resp.HasMoreRows
 	}
-
+	fmt.Println(r.rowSet.String(), r.offset)
 	row := r.rowSet.Rows[r.offset]
 	r.nextRow = make([]interface{}, len(r.Columns()))
 
@@ -260,7 +260,7 @@ func (r *rowSet) Handle() ([]byte, error) {
 	return serializeOp(r.operation)
 }
 
-func convertRow(row *gohive.TRow, dest []interface{}) error {
+func convertRow(row *inf.TRow, dest []interface{}) error {
 	if len(row.ColVals) != len(dest) {
 		return fmt.Errorf("Returned row has %d values, but scan row has %d", len(row.ColVals), len(dest))
 	}
@@ -276,7 +276,7 @@ func convertRow(row *gohive.TRow, dest []interface{}) error {
 	return nil
 }
 
-func convertColumn(col *gohive.TColumnValue) (interface{}, error) {
+func convertColumn(col *inf.TColumnValue) (interface{}, error) {
 	switch {
 	case col.StringVal.IsSetValue():
 		return col.StringVal.GetValue(), nil
@@ -312,10 +312,10 @@ func (s Status) IsComplete() bool {
 	}
 
 	switch *s.state {
-	case gohive.TOperationState_FINISHED_STATE,
-		gohive.TOperationState_CANCELED_STATE,
-		gohive.TOperationState_CLOSED_STATE,
-		gohive.TOperationState_ERROR_STATE:
+	case inf.TOperationState_FINISHED_STATE,
+		inf.TOperationState_CANCELED_STATE,
+		inf.TOperationState_CLOSED_STATE,
+		inf.TOperationState_ERROR_STATE:
 		return true
 	}
 
@@ -328,12 +328,12 @@ func (s Status) IsSuccess() bool {
 		return false
 	}
 
-	return *s.state == gohive.TOperationState_FINISHED_STATE
+	return *s.state == inf.TOperationState_FINISHED_STATE
 }
 
-func deserializeOp(handle []byte) (*gohive.TOperationHandle, error) {
+func deserializeOp(handle []byte) (*inf.TOperationHandle, error) {
 	ser := thrift.NewTDeserializer()
-	var val gohive.TOperationHandle
+	var val inf.TOperationHandle
 
 	if err := ser.Read(&val, handle); err != nil {
 		return nil, err
@@ -342,7 +342,7 @@ func deserializeOp(handle []byte) (*gohive.TOperationHandle, error) {
 	return &val, nil
 }
 
-func serializeOp(operation *gohive.TOperationHandle) ([]byte, error) {
+func serializeOp(operation *inf.TOperationHandle) ([]byte, error) {
 	ser := thrift.NewTSerializer()
 	return ser.Write(operation)
 }

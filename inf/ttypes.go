@@ -6,6 +6,7 @@ package inf
 import (
 	"bytes"
 	"fmt"
+
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
@@ -19,15 +20,16 @@ var GoUnusedProtection__ int
 type TProtocolVersion int64
 
 const (
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V1 TProtocolVersion = 0
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V2 TProtocolVersion = 1
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V3 TProtocolVersion = 2
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V4 TProtocolVersion = 3
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V5 TProtocolVersion = 4
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V6 TProtocolVersion = 5
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V7 TProtocolVersion = 6
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V8 TProtocolVersion = 7
-	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V9 TProtocolVersion = 8
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V1  TProtocolVersion = 0
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V2  TProtocolVersion = 1
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V3  TProtocolVersion = 2
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V4  TProtocolVersion = 3
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V5  TProtocolVersion = 4
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V6  TProtocolVersion = 5
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V7  TProtocolVersion = 6
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V8  TProtocolVersion = 7
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V9  TProtocolVersion = 8
+	TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V10 TProtocolVersion = 9
 )
 
 func (p TProtocolVersion) String() string {
@@ -50,6 +52,8 @@ func (p TProtocolVersion) String() string {
 		return "HIVE_CLI_SERVICE_PROTOCOL_V8"
 	case TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V9:
 		return "HIVE_CLI_SERVICE_PROTOCOL_V9"
+	case TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V10:
+		return "HIVE_CLI_SERVICE_PROTOCOL_V10"
 	}
 	return "<UNSET>"
 }
@@ -74,6 +78,8 @@ func TProtocolVersionFromString(s string) (TProtocolVersion, error) {
 		return TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V8, nil
 	case "HIVE_CLI_SERVICE_PROTOCOL_V9":
 		return TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V9, nil
+	case "HIVE_CLI_SERVICE_PROTOCOL_V10":
+		return TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V10, nil
 	}
 	return TProtocolVersion(0), fmt.Errorf("not a valid TProtocolVersion string")
 }
@@ -768,6 +774,53 @@ func (p TFetchOrientation) MarshalText() ([]byte, error) {
 
 func (p *TFetchOrientation) UnmarshalText(text []byte) error {
 	q, err := TFetchOrientationFromString(string(text))
+	if err != nil {
+		return err
+	}
+	*p = q
+	return nil
+}
+
+type TJobExecutionStatus int64
+
+const (
+	TJobExecutionStatus_IN_PROGRESS   TJobExecutionStatus = 0
+	TJobExecutionStatus_COMPLETE      TJobExecutionStatus = 1
+	TJobExecutionStatus_NOT_AVAILABLE TJobExecutionStatus = 2
+)
+
+func (p TJobExecutionStatus) String() string {
+	switch p {
+	case TJobExecutionStatus_IN_PROGRESS:
+		return "IN_PROGRESS"
+	case TJobExecutionStatus_COMPLETE:
+		return "COMPLETE"
+	case TJobExecutionStatus_NOT_AVAILABLE:
+		return "NOT_AVAILABLE"
+	}
+	return "<UNSET>"
+}
+
+func TJobExecutionStatusFromString(s string) (TJobExecutionStatus, error) {
+	switch s {
+	case "IN_PROGRESS":
+		return TJobExecutionStatus_IN_PROGRESS, nil
+	case "COMPLETE":
+		return TJobExecutionStatus_COMPLETE, nil
+	case "NOT_AVAILABLE":
+		return TJobExecutionStatus_NOT_AVAILABLE, nil
+	}
+	return TJobExecutionStatus(0), fmt.Errorf("not a valid TJobExecutionStatus string")
+}
+
+func TJobExecutionStatusPtr(v TJobExecutionStatus) *TJobExecutionStatus { return &v }
+
+func (p TJobExecutionStatus) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
+
+func (p *TJobExecutionStatus) UnmarshalText(text []byte) error {
+	q, err := TJobExecutionStatusFromString(string(text))
 	if err != nil {
 		return err
 	}
@@ -6289,7 +6342,7 @@ func (p *THandleIdentifier) writeField1(oprot thrift.TProtocol) (err error) {
 	if err := oprot.WriteFieldBegin("guid", thrift.STRING, 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:guid: ", p), err)
 	}
-	if err := oprot.WriteBinary(p.GUID); err != nil {
+	if err := oprot.WriteString(string(p.GUID)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T.guid (1) field write error: ", p), err)
 	}
 	if err := oprot.WriteFieldEnd(); err != nil {
@@ -6669,7 +6722,7 @@ type TOpenSessionReq struct {
 
 func NewTOpenSessionReq() *TOpenSessionReq {
 	return &TOpenSessionReq{
-		ClientProtocol: 8,
+		ClientProtocol: 9,
 	}
 }
 
@@ -6934,7 +6987,7 @@ type TOpenSessionResp struct {
 
 func NewTOpenSessionResp() *TOpenSessionResp {
 	return &TOpenSessionResp{
-		ServerProtocolVersion: 8,
+		ServerProtocolVersion: 9,
 	}
 }
 
@@ -11850,8 +11903,10 @@ func (p *TGetCrossReferenceResp) String() string {
 
 // Attributes:
 //  - OperationHandle
+//  - GetProgressUpdate
 type TGetOperationStatusReq struct {
-	OperationHandle *TOperationHandle `thrift:"operationHandle,1,required" json:"operationHandle"`
+	OperationHandle   *TOperationHandle `thrift:"operationHandle,1,required" json:"operationHandle"`
+	GetProgressUpdate *bool             `thrift:"getProgressUpdate,2" json:"getProgressUpdate,omitempty"`
 }
 
 func NewTGetOperationStatusReq() *TGetOperationStatusReq {
@@ -11866,8 +11921,21 @@ func (p *TGetOperationStatusReq) GetOperationHandle() *TOperationHandle {
 	}
 	return p.OperationHandle
 }
+
+var TGetOperationStatusReq_GetProgressUpdate_DEFAULT bool
+
+func (p *TGetOperationStatusReq) GetGetProgressUpdate() bool {
+	if !p.IsSetGetProgressUpdate() {
+		return TGetOperationStatusReq_GetProgressUpdate_DEFAULT
+	}
+	return *p.GetProgressUpdate
+}
 func (p *TGetOperationStatusReq) IsSetOperationHandle() bool {
 	return p.OperationHandle != nil
+}
+
+func (p *TGetOperationStatusReq) IsSetGetProgressUpdate() bool {
+	return p.GetProgressUpdate != nil
 }
 
 func (p *TGetOperationStatusReq) Read(iprot thrift.TProtocol) error {
@@ -11891,6 +11959,10 @@ func (p *TGetOperationStatusReq) Read(iprot thrift.TProtocol) error {
 				return err
 			}
 			issetOperationHandle = true
+		case 2:
+			if err := p.readField2(iprot); err != nil {
+				return err
+			}
 		default:
 			if err := iprot.Skip(fieldTypeId); err != nil {
 				return err
@@ -11917,11 +11989,23 @@ func (p *TGetOperationStatusReq) readField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *TGetOperationStatusReq) readField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadBool(); err != nil {
+		return thrift.PrependError("error reading field 2: ", err)
+	} else {
+		p.GetProgressUpdate = &v
+	}
+	return nil
+}
+
 func (p *TGetOperationStatusReq) Write(oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin("TGetOperationStatusReq"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if err := p.writeField1(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField2(oprot); err != nil {
 		return err
 	}
 	if err := oprot.WriteFieldStop(); err != nil {
@@ -11946,6 +12030,21 @@ func (p *TGetOperationStatusReq) writeField1(oprot thrift.TProtocol) (err error)
 	return err
 }
 
+func (p *TGetOperationStatusReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if p.IsSetGetProgressUpdate() {
+		if err := oprot.WriteFieldBegin("getProgressUpdate", thrift.BOOL, 2); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:getProgressUpdate: ", p), err)
+		}
+		if err := oprot.WriteBool(bool(*p.GetProgressUpdate)); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T.getProgressUpdate (2) field write error: ", p), err)
+		}
+		if err := oprot.WriteFieldEnd(); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T write field end error 2:getProgressUpdate: ", p), err)
+		}
+	}
+	return err
+}
+
 func (p *TGetOperationStatusReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -11963,16 +12062,18 @@ func (p *TGetOperationStatusReq) String() string {
 //  - OperationStarted
 //  - OperationCompleted
 //  - HasResultSet
+//  - ProgressUpdateResponse
 type TGetOperationStatusResp struct {
-	Status             *TStatus         `thrift:"status,1,required" json:"status"`
-	OperationState     *TOperationState `thrift:"operationState,2" json:"operationState,omitempty"`
-	SqlState           *string          `thrift:"sqlState,3" json:"sqlState,omitempty"`
-	ErrorCode          *int32           `thrift:"errorCode,4" json:"errorCode,omitempty"`
-	ErrorMessage       *string          `thrift:"errorMessage,5" json:"errorMessage,omitempty"`
-	TaskStatus         *string          `thrift:"taskStatus,6" json:"taskStatus,omitempty"`
-	OperationStarted   *int64           `thrift:"operationStarted,7" json:"operationStarted,omitempty"`
-	OperationCompleted *int64           `thrift:"operationCompleted,8" json:"operationCompleted,omitempty"`
-	HasResultSet       *bool            `thrift:"hasResultSet,9" json:"hasResultSet,omitempty"`
+	Status                 *TStatus             `thrift:"status,1,required" json:"status"`
+	OperationState         *TOperationState     `thrift:"operationState,2" json:"operationState,omitempty"`
+	SqlState               *string              `thrift:"sqlState,3" json:"sqlState,omitempty"`
+	ErrorCode              *int32               `thrift:"errorCode,4" json:"errorCode,omitempty"`
+	ErrorMessage           *string              `thrift:"errorMessage,5" json:"errorMessage,omitempty"`
+	TaskStatus             *string              `thrift:"taskStatus,6" json:"taskStatus,omitempty"`
+	OperationStarted       *int64               `thrift:"operationStarted,7" json:"operationStarted,omitempty"`
+	OperationCompleted     *int64               `thrift:"operationCompleted,8" json:"operationCompleted,omitempty"`
+	HasResultSet           *bool                `thrift:"hasResultSet,9" json:"hasResultSet,omitempty"`
+	ProgressUpdateResponse *TProgressUpdateResp `thrift:"progressUpdateResponse,10" json:"progressUpdateResponse,omitempty"`
 }
 
 func NewTGetOperationStatusResp() *TGetOperationStatusResp {
@@ -12059,6 +12160,15 @@ func (p *TGetOperationStatusResp) GetHasResultSet() bool {
 	}
 	return *p.HasResultSet
 }
+
+var TGetOperationStatusResp_ProgressUpdateResponse_DEFAULT TProgressUpdateResp
+
+func (p *TGetOperationStatusResp) GetProgressUpdateResponse() TProgressUpdateResp {
+	if !p.IsSetProgressUpdateResponse() {
+		return TGetOperationStatusResp_ProgressUpdateResponse_DEFAULT
+	}
+	return *p.ProgressUpdateResponse
+}
 func (p *TGetOperationStatusResp) IsSetStatus() bool {
 	return p.Status != nil
 }
@@ -12093,6 +12203,10 @@ func (p *TGetOperationStatusResp) IsSetOperationCompleted() bool {
 
 func (p *TGetOperationStatusResp) IsSetHasResultSet() bool {
 	return p.HasResultSet != nil
+}
+
+func (p *TGetOperationStatusResp) IsSetProgressUpdateResponse() bool {
+	return p.ProgressUpdateResponse != nil
 }
 
 func (p *TGetOperationStatusResp) Read(iprot thrift.TProtocol) error {
@@ -12146,6 +12260,10 @@ func (p *TGetOperationStatusResp) Read(iprot thrift.TProtocol) error {
 			}
 		case 9:
 			if err := p.readField9(iprot); err != nil {
+				return err
+			}
+		case 10:
+			if err := p.readField10(iprot); err != nil {
 				return err
 			}
 		default:
@@ -12247,6 +12365,14 @@ func (p *TGetOperationStatusResp) readField9(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *TGetOperationStatusResp) readField10(iprot thrift.TProtocol) error {
+	p.ProgressUpdateResponse = &TProgressUpdateResp{}
+	if err := p.ProgressUpdateResponse.Read(iprot); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.ProgressUpdateResponse), err)
+	}
+	return nil
+}
+
 func (p *TGetOperationStatusResp) Write(oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin("TGetOperationStatusResp"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
@@ -12276,6 +12402,9 @@ func (p *TGetOperationStatusResp) Write(oprot thrift.TProtocol) error {
 		return err
 	}
 	if err := p.writeField9(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField10(oprot); err != nil {
 		return err
 	}
 	if err := oprot.WriteFieldStop(); err != nil {
@@ -12415,6 +12544,21 @@ func (p *TGetOperationStatusResp) writeField9(oprot thrift.TProtocol) (err error
 		}
 		if err := oprot.WriteFieldEnd(); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field end error 9:hasResultSet: ", p), err)
+		}
+	}
+	return err
+}
+
+func (p *TGetOperationStatusResp) writeField10(oprot thrift.TProtocol) (err error) {
+	if p.IsSetProgressUpdateResponse() {
+		if err := oprot.WriteFieldBegin("progressUpdateResponse", thrift.STRUCT, 10); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T write field begin error 10:progressUpdateResponse: ", p), err)
+		}
+		if err := p.ProgressUpdateResponse.Write(oprot); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ProgressUpdateResponse), err)
+		}
+		if err := oprot.WriteFieldEnd(); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T write field end error 10:progressUpdateResponse: ", p), err)
 		}
 	}
 	return err
@@ -14363,4 +14507,364 @@ func (p *TRenewDelegationTokenResp) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("TRenewDelegationTokenResp(%+v)", *p)
+}
+
+// Attributes:
+//  - HeaderNames
+//  - Rows
+//  - ProgressedPercentage
+//  - Status
+//  - FooterSummary
+//  - StartTime
+type TProgressUpdateResp struct {
+	HeaderNames          []string            `thrift:"headerNames,1,required" json:"headerNames"`
+	Rows                 [][]string          `thrift:"rows,2,required" json:"rows"`
+	ProgressedPercentage float64             `thrift:"progressedPercentage,3,required" json:"progressedPercentage"`
+	Status               TJobExecutionStatus `thrift:"status,4,required" json:"status"`
+	FooterSummary        string              `thrift:"footerSummary,5,required" json:"footerSummary"`
+	StartTime            int64               `thrift:"startTime,6,required" json:"startTime"`
+}
+
+func NewTProgressUpdateResp() *TProgressUpdateResp {
+	return &TProgressUpdateResp{}
+}
+
+func (p *TProgressUpdateResp) GetHeaderNames() []string {
+	return p.HeaderNames
+}
+
+func (p *TProgressUpdateResp) GetRows() [][]string {
+	return p.Rows
+}
+
+func (p *TProgressUpdateResp) GetProgressedPercentage() float64 {
+	return p.ProgressedPercentage
+}
+
+func (p *TProgressUpdateResp) GetStatus() TJobExecutionStatus {
+	return p.Status
+}
+
+func (p *TProgressUpdateResp) GetFooterSummary() string {
+	return p.FooterSummary
+}
+
+func (p *TProgressUpdateResp) GetStartTime() int64 {
+	return p.StartTime
+}
+func (p *TProgressUpdateResp) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+	}
+
+	var issetHeaderNames bool = false
+	var issetRows bool = false
+	var issetProgressedPercentage bool = false
+	var issetStatus bool = false
+	var issetFooterSummary bool = false
+	var issetStartTime bool = false
+
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if err := p.readField1(iprot); err != nil {
+				return err
+			}
+			issetHeaderNames = true
+		case 2:
+			if err := p.readField2(iprot); err != nil {
+				return err
+			}
+			issetRows = true
+		case 3:
+			if err := p.readField3(iprot); err != nil {
+				return err
+			}
+			issetProgressedPercentage = true
+		case 4:
+			if err := p.readField4(iprot); err != nil {
+				return err
+			}
+			issetStatus = true
+		case 5:
+			if err := p.readField5(iprot); err != nil {
+				return err
+			}
+			issetFooterSummary = true
+		case 6:
+			if err := p.readField6(iprot); err != nil {
+				return err
+			}
+			issetStartTime = true
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+	}
+	if !issetHeaderNames {
+		return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field HeaderNames is not set"))
+	}
+	if !issetRows {
+		return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Rows is not set"))
+	}
+	if !issetProgressedPercentage {
+		return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ProgressedPercentage is not set"))
+	}
+	if !issetStatus {
+		return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"))
+	}
+	if !issetFooterSummary {
+		return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field FooterSummary is not set"))
+	}
+	if !issetStartTime {
+		return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field StartTime is not set"))
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) readField1(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return thrift.PrependError("error reading list begin: ", err)
+	}
+	tSlice := make([]string, 0, size)
+	p.HeaderNames = tSlice
+	for i := 0; i < size; i++ {
+		var _elem27 string
+		if v, err := iprot.ReadString(); err != nil {
+			return thrift.PrependError("error reading field 0: ", err)
+		} else {
+			_elem27 = v
+		}
+		p.HeaderNames = append(p.HeaderNames, _elem27)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return thrift.PrependError("error reading list end: ", err)
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) readField2(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return thrift.PrependError("error reading list begin: ", err)
+	}
+	tSlice := make([][]string, 0, size)
+	p.Rows = tSlice
+	for i := 0; i < size; i++ {
+		_, size, err := iprot.ReadListBegin()
+		if err != nil {
+			return thrift.PrependError("error reading list begin: ", err)
+		}
+		tSlice := make([]string, 0, size)
+		_elem28 := tSlice
+		for i := 0; i < size; i++ {
+			var _elem29 string
+			if v, err := iprot.ReadString(); err != nil {
+				return thrift.PrependError("error reading field 0: ", err)
+			} else {
+				_elem29 = v
+			}
+			_elem28 = append(_elem28, _elem29)
+		}
+		if err := iprot.ReadListEnd(); err != nil {
+			return thrift.PrependError("error reading list end: ", err)
+		}
+		p.Rows = append(p.Rows, _elem28)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return thrift.PrependError("error reading list end: ", err)
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) readField3(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadDouble(); err != nil {
+		return thrift.PrependError("error reading field 3: ", err)
+	} else {
+		p.ProgressedPercentage = v
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) readField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return thrift.PrependError("error reading field 4: ", err)
+	} else {
+		temp := TJobExecutionStatus(v)
+		p.Status = temp
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) readField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return thrift.PrependError("error reading field 5: ", err)
+	} else {
+		p.FooterSummary = v
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) readField6(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return thrift.PrependError("error reading field 6: ", err)
+	} else {
+		p.StartTime = v
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("TProgressUpdateResp"); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+	}
+	if err := p.writeField1(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField2(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField3(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField4(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField5(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField6(oprot); err != nil {
+		return err
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return thrift.PrependError("write field stop error: ", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return thrift.PrependError("write struct stop error: ", err)
+	}
+	return nil
+}
+
+func (p *TProgressUpdateResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("headerNames", thrift.LIST, 1); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:headerNames: ", p), err)
+	}
+	if err := oprot.WriteListBegin(thrift.STRING, len(p.HeaderNames)); err != nil {
+		return thrift.PrependError("error writing list begin: ", err)
+	}
+	for _, v := range p.HeaderNames {
+		if err := oprot.WriteString(string(v)); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return thrift.PrependError("error writing list end: ", err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:headerNames: ", p), err)
+	}
+	return err
+}
+
+func (p *TProgressUpdateResp) writeField2(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("rows", thrift.LIST, 2); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:rows: ", p), err)
+	}
+	if err := oprot.WriteListBegin(thrift.LIST, len(p.Rows)); err != nil {
+		return thrift.PrependError("error writing list begin: ", err)
+	}
+	for _, v := range p.Rows {
+		if err := oprot.WriteListBegin(thrift.STRING, len(v)); err != nil {
+			return thrift.PrependError("error writing list begin: ", err)
+		}
+		for _, v := range v {
+			if err := oprot.WriteString(string(v)); err != nil {
+				return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
+			}
+		}
+		if err := oprot.WriteListEnd(); err != nil {
+			return thrift.PrependError("error writing list end: ", err)
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return thrift.PrependError("error writing list end: ", err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 2:rows: ", p), err)
+	}
+	return err
+}
+
+func (p *TProgressUpdateResp) writeField3(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("progressedPercentage", thrift.DOUBLE, 3); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:progressedPercentage: ", p), err)
+	}
+	if err := oprot.WriteDouble(float64(p.ProgressedPercentage)); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.progressedPercentage (3) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 3:progressedPercentage: ", p), err)
+	}
+	return err
+}
+
+func (p *TProgressUpdateResp) writeField4(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("status", thrift.I32, 4); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:status: ", p), err)
+	}
+	if err := oprot.WriteI32(int32(p.Status)); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.status (4) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 4:status: ", p), err)
+	}
+	return err
+}
+
+func (p *TProgressUpdateResp) writeField5(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("footerSummary", thrift.STRING, 5); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:footerSummary: ", p), err)
+	}
+	if err := oprot.WriteString(string(p.FooterSummary)); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.footerSummary (5) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 5:footerSummary: ", p), err)
+	}
+	return err
+}
+
+func (p *TProgressUpdateResp) writeField6(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("startTime", thrift.I64, 6); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:startTime: ", p), err)
+	}
+	if err := oprot.WriteI64(int64(p.StartTime)); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.startTime (6) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 6:startTime: ", p), err)
+	}
+	return err
+}
+
+func (p *TProgressUpdateResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("TProgressUpdateResp(%+v)", *p)
 }

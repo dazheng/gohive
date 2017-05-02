@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	gohive "github.com/dazheng/gohive/inf"
+	inf "github.com/dazheng/gohive/inf"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
@@ -22,8 +22,8 @@ var (
 )
 
 type Connection struct {
-	thrift  *gohive.TCLIServiceClient
-	session *gohive.TSessionHandle
+	thrift  *inf.TCLIServiceClient
+	session *inf.TSessionHandle
 	options Options
 }
 
@@ -47,10 +47,10 @@ func Connect(host string, options Options) (*Connection, error) {
 		of this writing.
 	*/
 	protocol := thrift.NewTBinaryProtocolFactoryDefault()
-	client := gohive.NewTCLIServiceClientFactory(transport, protocol)
-	s := gohive.NewTOpenSessionReq()
+	client := inf.NewTCLIServiceClientFactory(transport, protocol)
+	s := inf.NewTOpenSessionReq()
 	s.ClientProtocol = 7
-	//	session, err := client.OpenSession(gohive.NewTOpenSessionReq())
+	//	session, err := client.OpenSession(inf.NewTOpenSessionReq())
 	session, err := client.OpenSession(s)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (c *Connection) isOpen() bool {
 // connection is invalid for other use.
 func (c *Connection) Close() error {
 	if c.isOpen() {
-		closeReq := gohive.NewTCloseSessionReq()
+		closeReq := inf.NewTCloseSessionReq()
 		closeReq.SessionHandle = c.session
 		resp, err := c.thrift.CloseSession(closeReq)
 		if err != nil {
@@ -82,8 +82,25 @@ func (c *Connection) Close() error {
 
 // Issue a query on an open connection, returning a RowSet, which
 // can be later used to query the operation's status.
-func (c *Connection) Query(query string) (RowSet, error) {
-	executeReq := gohive.NewTExecuteStatementReq()
+//func (c *Connection) Query(query string) (RowSet, error) {
+//	executeReq := inf.NewTExecuteStatementReq()
+//	executeReq.SessionHandle = c.session
+//	executeReq.Statement = query
+
+//	resp, err := c.thrift.ExecuteStatement(executeReq)
+//	if err != nil {
+//		return nil, fmt.Errorf("Error in ExecuteStatement: %+v, %v", resp, err)
+//	}
+
+//	if !isSuccessStatus(resp.Status) {
+//		return nil, fmt.Errorf("Error from server: %s", resp.Status.String())
+//	}
+
+//	return newRowSet(c.thrift, resp.OperationHandle, c.options), nil
+//}
+
+func (c *Connection) Exec(query string) (*inf.TExecuteStatementResp, error) {
+	executeReq := inf.NewTExecuteStatementReq()
 	executeReq.SessionHandle = c.session
 	executeReq.Statement = query
 
@@ -96,10 +113,10 @@ func (c *Connection) Query(query string) (RowSet, error) {
 		return nil, fmt.Errorf("Error from server: %s", resp.Status.String())
 	}
 
-	return newRowSet(c.thrift, resp.OperationHandle, c.options), nil
+	return resp, err
 }
 
-func isSuccessStatus(p *gohive.TStatus) bool {
+func isSuccessStatus(p *inf.TStatus) bool {
 	status := p.GetStatusCode()
-	return status == gohive.TStatusCode_SUCCESS_STATUS || status == gohive.TStatusCode_SUCCESS_WITH_INFO_STATUS
+	return status == inf.TStatusCode_SUCCESS_STATUS || status == inf.TStatusCode_SUCCESS_WITH_INFO_STATUS
 }
