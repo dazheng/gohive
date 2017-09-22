@@ -49,7 +49,7 @@ func Connect(host string, options Options) (*Connection, error) {
 	protocol := thrift.NewTBinaryProtocolFactoryDefault()
 	client := inf.NewTCLIServiceClientFactory(transport, protocol)
 	s := inf.NewTOpenSessionReq()
-	s.ClientProtocol = 7
+	s.ClientProtocol = 6
 	//	session, err := client.OpenSession(inf.NewTOpenSessionReq())
 	session, err := client.OpenSession(s)
 	if err != nil {

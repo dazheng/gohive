@@ -352,7 +352,7 @@ struct TBoolColumn {
 }
 
 struct TByteColumn {
-  1: required list<byte> values
+  1: required binary values
   2: required binary nulls
 }
 
