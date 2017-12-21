@@ -1,9 +1,11 @@
 package gohive
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	inf "github.com/dazheng/gohive/inf"
@@ -19,12 +21,12 @@ type rowSet struct {
 	columns    []*inf.TColumnDesc
 	columnStrs []string
 
-	offset  int
-	rowSet  *inf.TRowSet
-	hasMore bool
-	ready   bool
-
-	nextRow []interface{}
+	offset    int
+	rowSet    *inf.TRowSet
+	hasMore   bool
+	ready     bool
+	resultSet [][]interface{}
+	nextRow   []interface{}
 }
 
 // A RowSet represents an asyncronous hive operation. You can
@@ -49,18 +51,7 @@ type Status struct {
 }
 
 func newRowSet(thrift *inf.TCLIServiceClient, operation *inf.TOperationHandle, options Options) RowSet {
-	return &rowSet{thrift, operation, options, nil, nil, 0, nil, true, false, nil}
-}
-
-// Construct a RowSet for a previously submitted operation, using the prior operation's Handle()
-// and a valid thrift client to a hive service that is aware of the operation.
-func Reattach(conn *Connection, handle []byte) (RowSet, error) {
-	operation, err := deserializeOp(handle)
-	if err != nil {
-		return nil, err
-	}
-
-	return newRowSet(conn.thrift, operation, conn.options), nil
+	return &rowSet{thrift, operation, options, nil, nil, 0, nil, true, false, nil, nil}
 }
 
 // Issue a thrift call to check for the job's current status.
@@ -68,7 +59,7 @@ func (r *rowSet) Poll() (*Status, error) {
 	req := inf.NewTGetOperationStatusReq()
 	req.OperationHandle = r.operation
 
-	resp, err := r.thrift.GetOperationStatus(req)
+	resp, err := r.thrift.GetOperationStatus(context.Background(), req)
 	if err != nil {
 		return nil, fmt.Errorf("Error getting status: %+v, %v", resp, err)
 	}
@@ -99,7 +90,7 @@ func (r *rowSet) Wait() (*Status, error) {
 				metadataReq := inf.NewTGetResultSetMetadataReq()
 				metadataReq.OperationHandle = r.operation
 
-				metadataResp, err := r.thrift.GetResultSetMetadata(metadataReq)
+				metadataResp, err := r.thrift.GetResultSetMetadata(context.Background(), metadataReq)
 				if err != nil {
 					return nil, err
 				}
@@ -134,6 +125,49 @@ func (r *rowSet) waitForSuccess() error {
 	return nil
 }
 
+func (r *rowSet) fetchAll() bool {
+	if !r.hasMore {
+		return false
+	}
+
+	fetchReq := inf.NewTFetchResultsReq()
+	fetchReq.OperationHandle = r.operation
+	fetchReq.Orientation = inf.TFetchOrientation_FETCH_NEXT
+	fetchReq.MaxRows = r.options.BatchSize
+
+	resp, err := r.thrift.FetchResults(context.Background(), fetchReq)
+	if err != nil {
+		log.Printf("FetchResults failed: %v\n", err)
+		return false
+	}
+
+	if !isSuccessStatus(resp.Status) {
+		log.Printf("FetchResults failed: %s\n", resp.Status.String())
+		return false
+	}
+
+	r.offset = 0
+	r.rowSet = resp.GetResults()
+	r.hasMore = *resp.HasMoreRows
+
+	rs := r.rowSet.Columns
+	colLen := len(rs)
+	r.resultSet = make([][]interface{}, colLen)
+
+	// 先列后行
+	for i := 0; i < colLen; i++ {
+		v, length := convertColumn(rs[i])
+		c := make([]interface{}, length)
+		for j := 0; j < length; j++ {
+			c[j] = reflect.ValueOf(v).Index(j).Interface()
+		}
+		r.resultSet[i] = c
+	}
+
+	return true
+
+}
+
 // Prepares a row for scanning into memory, by reading data from hive if
 // the operation is successful, blocking until the operation is
 // complete, if necessary.
@@ -144,41 +178,24 @@ func (r *rowSet) Next() bool {
 		return false
 	}
 
-	if r.rowSet == nil || r.offset >= len(r.rowSet.Rows) {
-		if !r.hasMore {
-			return false
-		}
-
-		fetchReq := inf.NewTFetchResultsReq()
-		fetchReq.OperationHandle = r.operation
-		fetchReq.Orientation = inf.TFetchOrientation_FETCH_NEXT
-		fetchReq.MaxRows = r.options.BatchSize
-
-		resp, err := r.thrift.FetchResults(fetchReq)
-		if err != nil {
-			log.Printf("FetchResults failed: %v\n", err)
-			return false
-		}
-
-		if !isSuccessStatus(resp.Status) {
-			log.Printf("FetchResults failed: %s\n", resp.Status.String())
-			return false
-		}
-
+	if r.resultSet == nil {
+		r.fetchAll()
 		r.offset = 0
-		r.rowSet = resp.Results
-		r.hasMore = *resp.HasMoreRows
+		//		fmt.Println(r.resultSet)
 	}
-	fmt.Println(r.rowSet.String(), r.offset)
-	row := r.rowSet.Rows[r.offset]
-	r.nextRow = make([]interface{}, len(r.Columns()))
 
-	if err := convertRow(row, r.nextRow); err != nil {
-		log.Printf("Error converting row: %v", err)
+	if len(r.resultSet) <= 0 {
 		return false
 	}
+	if r.offset >= len(r.resultSet[0]) {
+		return false
+	}
+	r.nextRow = make([]interface{}, 0)
+	for _, v := range r.resultSet {
+		r.nextRow = append(r.nextRow, v[r.offset])
+	}
+	//	fmt.Println(r.nextRow)
 	r.offset++
-
 	return true
 }
 
@@ -260,40 +277,24 @@ func (r *rowSet) Handle() ([]byte, error) {
 	return serializeOp(r.operation)
 }
 
-func convertRow(row *inf.TRow, dest []interface{}) error {
-	if len(row.ColVals) != len(dest) {
-		return fmt.Errorf("Returned row has %d values, but scan row has %d", len(row.ColVals), len(dest))
-	}
-
-	for i, col := range row.ColVals {
-		val, err := convertColumn(col)
-		if err != nil {
-			return fmt.Errorf("Error converting column %d: %v", i, err)
-		}
-		dest[i] = val
-	}
-
-	return nil
-}
-
-func convertColumn(col *inf.TColumnValue) (interface{}, error) {
+func convertColumn(col *inf.TColumn) (colValues interface{}, length int) {
 	switch {
-	case col.StringVal.IsSetValue():
-		return col.StringVal.GetValue(), nil
-	case col.BoolVal.IsSetValue():
-		return col.BoolVal.GetValue(), nil
-	case col.ByteVal.IsSetValue():
-		return int64(col.ByteVal.GetValue()), nil
-	case col.I16Val.IsSetValue():
-		return int32(col.I16Val.GetValue()), nil
-	case col.I32Val.IsSetValue():
-		return col.I32Val.GetValue(), nil
-	case col.I64Val.IsSetValue():
-		return col.I64Val.GetValue(), nil
-	case col.DoubleVal.IsSetValue():
-		return col.DoubleVal.GetValue(), nil
+	case col.IsSetStringVal():
+		return col.GetStringVal().GetValues(), len(col.GetStringVal().GetValues())
+	case col.IsSetBoolVal():
+		return col.GetBoolVal().GetValues(), len(col.GetBoolVal().GetValues())
+	case col.IsSetByteVal():
+		return col.GetByteVal().GetValues(), len(col.GetByteVal().GetValues())
+	case col.IsSetI16Val():
+		return col.GetI16Val().GetValues(), len(col.GetI16Val().GetValues())
+	case col.IsSetI32Val():
+		return col.GetI32Val().GetValues(), len(col.GetI32Val().GetValues())
+	case col.IsSetI64Val():
+		return col.GetI64Val().GetValues(), len(col.GetI64Val().GetValues())
+	case col.IsSetDoubleVal():
+		return col.GetDoubleVal().GetValues(), len(col.GetDoubleVal().GetValues())
 	default:
-		return nil, fmt.Errorf("Can't convert column value %v", col)
+		return nil, 0
 	}
 }
 

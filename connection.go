@@ -8,6 +8,8 @@ import (
 
 	inf "github.com/dazheng/gohive/inf"
 
+	"context"
+
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
@@ -50,8 +52,7 @@ func Connect(host string, options Options) (*Connection, error) {
 	client := inf.NewTCLIServiceClientFactory(transport, protocol)
 	s := inf.NewTOpenSessionReq()
 	s.ClientProtocol = 6
-	//	session, err := client.OpenSession(inf.NewTOpenSessionReq())
-	session, err := client.OpenSession(s)
+	session, err := client.OpenSession(context.Background(), s)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +70,7 @@ func (c *Connection) Close() error {
 	if c.isOpen() {
 		closeReq := inf.NewTCloseSessionReq()
 		closeReq.SessionHandle = c.session
-		resp, err := c.thrift.CloseSession(closeReq)
+		resp, err := c.thrift.CloseSession(context.Background(), closeReq)
 		if err != nil {
 			return fmt.Errorf("Error closing session: ", resp, err)
 		}
@@ -82,29 +83,29 @@ func (c *Connection) Close() error {
 
 // Issue a query on an open connection, returning a RowSet, which
 // can be later used to query the operation's status.
-//func (c *Connection) Query(query string) (RowSet, error) {
-//	executeReq := inf.NewTExecuteStatementReq()
-//	executeReq.SessionHandle = c.session
-//	executeReq.Statement = query
+func (c *Connection) Query(query string) (RowSet, error) {
+	executeReq := inf.NewTExecuteStatementReq()
+	executeReq.SessionHandle = c.session
+	executeReq.Statement = query
 
-//	resp, err := c.thrift.ExecuteStatement(executeReq)
-//	if err != nil {
-//		return nil, fmt.Errorf("Error in ExecuteStatement: %+v, %v", resp, err)
-//	}
+	resp, err := c.thrift.ExecuteStatement(context.Background(), executeReq)
+	if err != nil {
+		return nil, fmt.Errorf("Error in ExecuteStatement: %+v, %v", resp, err)
+	}
 
-//	if !isSuccessStatus(resp.Status) {
-//		return nil, fmt.Errorf("Error from server: %s", resp.Status.String())
-//	}
+	if !isSuccessStatus(resp.Status) {
+		return nil, fmt.Errorf("Error from server: %s", resp.Status.String())
+	}
 
-//	return newRowSet(c.thrift, resp.OperationHandle, c.options), nil
-//}
+	return newRowSet(c.thrift, resp.OperationHandle, c.options), nil
+}
 
 func (c *Connection) Exec(query string) (*inf.TExecuteStatementResp, error) {
 	executeReq := inf.NewTExecuteStatementReq()
 	executeReq.SessionHandle = c.session
 	executeReq.Statement = query
 
-	resp, err := c.thrift.ExecuteStatement(executeReq)
+	resp, err := c.thrift.ExecuteStatement(context.Background(), executeReq)
 	if err != nil {
 		return nil, fmt.Errorf("Error in ExecuteStatement: %+v, %v", resp, err)
 	}
