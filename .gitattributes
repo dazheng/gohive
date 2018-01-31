@@ -1,1 +1,2 @@
 *.go linguist-language=go
+*.thrift linguist-language=go
