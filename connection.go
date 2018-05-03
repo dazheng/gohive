@@ -29,7 +29,7 @@ type Connection struct {
 	options Options
 }
 
-func Connect(host string, options Options) (*Connection, error) {
+func Connect(host, username, password string, options Options) (*Connection, error) {
 	transport, err := thrift.NewTSocket(host)
 	if err != nil {
 		return nil, err
@@ -52,6 +52,8 @@ func Connect(host string, options Options) (*Connection, error) {
 	client := inf.NewTCLIServiceClientFactory(transport, protocol)
 	s := inf.NewTOpenSessionReq()
 	s.ClientProtocol = 6
+	s.Username = &username
+	s.Password = &password
 	session, err := client.OpenSession(context.Background(), s)
 	if err != nil {
 		return nil, err
