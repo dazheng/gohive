@@ -34,7 +34,7 @@ type rowSet struct {
 // have a valid thrift client, and the serialized Handle()
 // from the prior operation.
 type RowSet interface {
-	Handle() ([]byte, error)
+	Handle(ctx context.Context) ([]byte, error)
 	Columns() []string
 	Next() bool
 	Scan(dest ...interface{}) error
@@ -273,8 +273,8 @@ func (r *rowSet) Columns() []string {
 // Return a serialized representation of an identifier that can later
 // be used to reattach to a running operation. This identifier and
 // serialized representation should be considered opaque by users.
-func (r *rowSet) Handle() ([]byte, error) {
-	return serializeOp(r.operation)
+func (r *rowSet) Handle(ctx context.Context) ([]byte, error) {
+	return serializeOp(ctx, r.operation)
 }
 
 func convertColumn(col *inf.TColumn) (colValues interface{}, length int) {
@@ -343,7 +343,7 @@ func deserializeOp(handle []byte) (*inf.TOperationHandle, error) {
 	return &val, nil
 }
 
-func serializeOp(operation *inf.TOperationHandle) ([]byte, error) {
+func serializeOp(ctx context.Context, operation *inf.TOperationHandle) ([]byte, error) {
 	ser := thrift.NewTSerializer()
-	return ser.Write(operation)
+	return ser.Write(ctx, operation)
 }

@@ -29,7 +29,38 @@ type Connection struct {
 	options Options
 }
 
-func Connect(host, username, password string, options Options) (*Connection, error) {
+func Connect(host string, options Options) (*Connection, error) {
+	transport, err := thrift.NewTSocket(host)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := transport.Open(); err != nil {
+		return nil, err
+	}
+
+	if transport == nil {
+		return nil, errors.New("nil thrift transport")
+	}
+
+	/*
+		NB: hive 0.13's default is a TSaslProtocol, but
+		there isn't a golang implementation in apache thrift as
+		of this writing.
+	*/
+	protocol := thrift.NewTBinaryProtocolFactoryDefault()
+	client := inf.NewTCLIServiceClientFactory(transport, protocol)
+	s := inf.NewTOpenSessionReq()
+	s.ClientProtocol = 6
+	session, err := client.OpenSession(context.Background(), s)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Connection{client, session.SessionHandle, options}, nil
+}
+
+func ConnectWithUser(host, username, password string, options Options) (*Connection, error) {
 	transport, err := thrift.NewTSocket(host)
 	if err != nil {
 		return nil, err
